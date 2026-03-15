@@ -1,0 +1,4 @@
+DQ_Dimension,Rules_Count,Avg_Pass_Rate,Total_Failed,Rules_Passing,Rules_Warning,Rules_Failing,Dimension_Score,Dimension_Grade
+Completeness,2,98.44,337,0,2,0,98.44,B
+Uniqueness,1,100.0,0,1,0,0,100.0,A
+Validity,9,99.56444444444445,424,7,2,0,99.56,A
