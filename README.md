@@ -12,6 +12,10 @@
 
 This project implements an **enterprise-grade Data Governance and Data Quality Framework** applied to a publicly available Canadian housing dataset modelled after Canada Mortgage and Housing Corporation (CMHC) open data.
 
+## Dataset Note
+This project uses a synthetic dataset modelled after CMHC public housing starts data (Statistics Canada Table 34-10-0143-01). Same schema and value domains as the published dataset. Realistic DQ issues introduced intentionally for governance demonstration.
+Real data: https://www150.statcan.gc.ca
+
 It demonstrates the full governance lifecycle:
 
 > **Source Data → Metadata Catalog → Data Lineage → Stewardship Framework → DQ Rules → DQ Scorecard**
