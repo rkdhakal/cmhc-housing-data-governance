@@ -15,6 +15,10 @@ import os
 import json
 from datetime import datetime
 
+# ── HOW TO RUN ────────────────────────────────────────────────
+# python data_profiler.py
+# Output: docs/data_profile_report.html + scorecard/column_profile.csv
+
 # ── CONFIGURATION ─────────────────────────────────────────────────────────────
 DATASET_PATH = "data/raw/cmhc_housing_starts_2018_2023.csv"
 REPORT_PATH  = "docs/data_profile_report.html"
