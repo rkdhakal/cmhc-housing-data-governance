@@ -1,7 +1,6 @@
 # 🏠 Canadian Housing Data Governance & Quality Framework
 
-**Author:** Ram Krishna Dhakal  
-**LinkedIn:** linkedin.com/in/ramkrishnadhakal  
+**Author:** Ram Krishna Dhakal   
 **Tools:** SQL · Python · Collibra (concepts) · Informatica IDMC (concepts)  
 **Dataset:** CMHC Housing Starts — Canada (2018–2023) | 10,800 records · 16 columns  
 **Status:** ✅ Complete
@@ -14,7 +13,7 @@ This project implements an **enterprise-grade Data Governance and Data Quality F
 
 ## Dataset Note
 This project uses a synthetic dataset modelled after CMHC public housing starts data (Statistics Canada Table 34-10-0143-01). Same schema and value domains as the published dataset. Realistic DQ issues introduced intentionally for governance demonstration.
-Real data: https://www150.statcan.gc.ca
+Real data: https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410014301
 
 It demonstrates the full governance lifecycle:
 
