@@ -71,7 +71,6 @@ cmhc-housing-data-governance/
 ├── dq_engine.py                # DQ rules execution engine (runs all 12 rules, remediates, generates report)
 ├── data_profiler.py            # Automated data profiling (column stats, domain validation, duplicates)
 ├── report_generator.py         # Centralized HTML report generator (DQ execution + data profile reports)
-├── lineage_diagram.py          # Generates the PNG lineage diagram (optional — Mermaid version in docs/)
 ├── requirements.txt            # Python dependencies
 └── README.md
 ```
@@ -192,7 +191,7 @@ graph LR
 
 | Tool | Usage in This Project |
 |------|-----------------------|
-| **Python (pandas, numpy, matplotlib)** | Data profiling, DQ rule execution, scorecard calculation, lineage visualization |
+| **Python (pandas, numpy)** | Data profiling, DQ rule execution, scorecard calculation |
 | **SQL** | All 12 DQ rules written as executable SQL queries |
 | **Collibra** *(conceptual)* | Metadata catalog structure, stewardship workflows, governance roles modelled after Collibra's framework |
 | **Informatica IDMC** *(conceptual)* | DQ rule design and exception management patterns modelled after IDMC |
@@ -216,9 +215,6 @@ python data_profiler.py
 # Run the DQ Engine (executes 12 rules, remediates data, generates scorecard & report)
 python dq_engine.py
 
-# Generate the Data Lineage Diagram
-python lineage_diagram.py
-
 # (Optional) Regenerate both HTML reports from saved CSVs
 python report_generator.py
 ```
@@ -226,7 +222,7 @@ python report_generator.py
 **Outputs:**
 - `docs/data_profile_report.html` — Interactive data profiling report
 - `docs/dq_execution_report.html` — DQ rules execution report with root cause analysis
-- `docs/data_lineage_diagram.png` — End-to-end data lineage visualization
+- `docs/data_lineage_diagram.mermaid` — Data lineage diagram (also rendered in README below)
 - `data/processed/cmhc_housing_starts_remediated.csv` — Cleaned dataset with DQ flags
 - `data/processed/dq_exceptions.csv` — Record-level exception log
 
