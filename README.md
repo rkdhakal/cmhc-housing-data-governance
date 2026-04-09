@@ -104,7 +104,7 @@ graph LR
         I1["🗄️ CMHC HMIP<br/><i>Housing Market Info Portal</i>"]
     end
     subgraph PROCESS ["⚙️ Layer 3 — Processing"]
-        P1["🔍 Informatica IDMC — DQ Engine"]
+        P1["🔍 Informatica IDMC <br/— DQ Engine"]
         P2["📚 Collibra Data Intelligence Cloud"]
         P3["🐍 Python DQ Engine<br/><i>dq_engine.py · data_profiler.py</i>"]
     end
