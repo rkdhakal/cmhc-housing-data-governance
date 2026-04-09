@@ -15,7 +15,7 @@
   .card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .card .value { font-size: 32px; font-weight: bold; color: #1F4E79; }
   .card .label { font-size: 12px; color: #7f8c8d; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .grade-card .value { color: #e74c3c; font-size: 48px; }
+  .grade-card .value { color: #2980b9; font-size: 48px; }
   .section { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   .section h2 { font-size: 18px; color: #1F4E79; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #2E75B6; }
   .section h3 { font-size: 14px; color: #555; margin: 16px 0 8px 0; }
@@ -39,7 +39,7 @@
 
 <div class="header">
   <h1>🏠 Data Profile Report — CMHC Housing Starts 2018–2023</h1>
-  <p>Author: Ram Krishna Dhakal &nbsp;|&nbsp; Generated: 2026-03-15 14:28 &nbsp;|&nbsp;
+  <p>Author: Ram Krishna Dhakal &nbsp;|&nbsp; Generated: 2026-04-08 23:46 &nbsp;|&nbsp;
      Dataset: cmhc_housing_starts_2018_2023.csv &nbsp;|&nbsp;
      Part of: Canadian Housing Data Governance & Quality Framework</p>
 </div>
@@ -49,11 +49,11 @@
   <!-- SCORECARD CARDS -->
   <div class="scorecard">
     <div class="card grade-card">
-      <div class="value">F</div>
+      <div class="value">B</div>
       <div class="label">Overall Grade</div>
     </div>
     <div class="card">
-      <div class="value">90.33%</div>
+      <div class="value">98.5%</div>
       <div class="label">Overall DQ Score</div>
     </div>
     <div class="card">
@@ -92,7 +92,7 @@
         <p style="font-size:12px;color:#555;margin-top:6px">Average non-null rate across all 16 columns</p>
       </div>
       <div class="dim-card">
-        <div class="dim-score">75.0%</div>
+        <div class="dim-score">99.51%</div>
         <div class="dim-name">Validity</div>
         <p style="font-size:12px;color:#555;margin-top:6px">Domain, format, and range checks passed</p>
       </div>
@@ -122,7 +122,7 @@
   <!-- COLUMN PROFILE TABLE -->
   <div class="section">
     <h2>🔍 Column-Level Profile</h2>
-    <table><thead><tr><th>Column</th><th>Is_CDE</th><th>Data_Type</th><th>Completeness_Pct</th><th>Null_Count</th><th>Unique_Values</th><th>Negative_Count</th><th>Outlier_Count_IQR</th></tr></thead><tbody><tr><td>REF_DATE</td><td>Yes</td><td>object</td><td>100.0</td><td>0</td><td>72</td><td>0</td><td>0</td></tr><tr><td>GEO</td><td>Yes</td><td>object</td><td>100.0</td><td>0</td><td>10</td><td>0</td><td>0</td></tr><tr><td>GEO_CODE</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>10</td><td>0</td><td>0</td></tr><tr><td>DWELLING_TYPE</td><td>Yes</td><td>object</td><td>100.0</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>INTENDED_MARKET</td><td>Yes</td><td>object</td><td>100.0</td><td>0</td><td>3</td><td>0</td><td>0</td></tr><tr><td>HOUSING_STARTS</td><td>Yes</td><td>float64</td><td>98.12</td><td>203</td><td>1329</td><td>307</td><td>106</td></tr><tr><td>AVERAGE_PRICE_CAD</td><td>Yes</td><td>float64</td><td>98.33</td><td>180</td><td>10618</td><td>117</td><td>2189</td></tr><tr><td>DATA_SOURCE</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>REPORTING_AGENCY</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>LAST_UPDATED</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>72</td><td>0</td><td>0</td></tr><tr><td>SURVEY_METHOD</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>3</td><td>0</td><td>0</td></tr><tr><td>GEOGRAPHY_TYPE</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>UOM</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>SCALAR_FACTOR</td><td>No</td><td>object</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>STATUS</td><td>No</td><td>object</td><td>39.49</td><td>6535</td><td>2</td><td>0</td><td>0</td></tr><tr><td>DECIMALS</td><td>No</td><td>int64</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr></tbody></table>
+    <table><thead><tr><th>Column</th><th>Is_CDE</th><th>Data_Type</th><th>Completeness_Pct</th><th>Null_Count</th><th>Unique_Values</th><th>Negative_Count</th><th>Outlier_Count_IQR</th></tr></thead><tbody><tr><td>REF_DATE</td><td>Yes</td><td>str</td><td>100.0</td><td>0</td><td>72</td><td>0</td><td>0</td></tr><tr><td>GEO</td><td>Yes</td><td>str</td><td>100.0</td><td>0</td><td>10</td><td>0</td><td>0</td></tr><tr><td>GEO_CODE</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>10</td><td>0</td><td>0</td></tr><tr><td>DWELLING_TYPE</td><td>Yes</td><td>str</td><td>100.0</td><td>0</td><td>5</td><td>0</td><td>0</td></tr><tr><td>INTENDED_MARKET</td><td>Yes</td><td>str</td><td>100.0</td><td>0</td><td>3</td><td>0</td><td>0</td></tr><tr><td>HOUSING_STARTS</td><td>Yes</td><td>float64</td><td>98.12</td><td>203</td><td>1329</td><td>307</td><td>106</td></tr><tr><td>AVERAGE_PRICE_CAD</td><td>Yes</td><td>float64</td><td>98.33</td><td>180</td><td>10618</td><td>117</td><td>2189</td></tr><tr><td>DATA_SOURCE</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>REPORTING_AGENCY</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>LAST_UPDATED</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>72</td><td>0</td><td>0</td></tr><tr><td>SURVEY_METHOD</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>3</td><td>0</td><td>0</td></tr><tr><td>GEOGRAPHY_TYPE</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>UOM</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>SCALAR_FACTOR</td><td>No</td><td>str</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr><tr><td>STATUS</td><td>No</td><td>str</td><td>39.49</td><td>6535</td><td>2</td><td>0</td><td>0</td></tr><tr><td>DECIMALS</td><td>No</td><td>int64</td><td>100.0</td><td>0</td><td>1</td><td>0</td><td>0</td></tr></tbody></table>
   </div>
 
   <!-- DOMAIN VALIDATION -->

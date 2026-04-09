@@ -174,9 +174,10 @@ def build_scorecard(df, col_profiles, domain_issues, dup_stats):
     # Completeness score
     avg_completeness = round(col_profiles["Completeness_Pct"].mean(), 2)
 
-    # Validity score (domain checks)
-    validity_passed = (domain_issues["Status"] == "PASS").sum()
-    validity_score  = round(validity_passed / len(domain_issues) * 100, 2)
+    # Validity score (weighted by records — consistent with DQ engine methodology)
+    total_checked   = domain_issues["Failed_Records"].count() * total
+    total_failed    = domain_issues["Failed_Records"].sum()
+    validity_score  = round((1 - total_failed / total_checked) * 100, 2) if total_checked > 0 else 100.0
 
     # Uniqueness score
     uniqueness_score = 100.0 if dup_stats["Grain_Duplicates"] == 0 else round(
