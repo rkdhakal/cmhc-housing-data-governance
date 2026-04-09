@@ -106,7 +106,7 @@ graph LR
     subgraph PROCESS ["⚙️ Layer 3 — Processing"]
         P1["🔍 Informatica IDMC <br/> DQ Engine"]
         P2["📚 Collibra Data <br/>Intelligence Cloud"]
-        P3["🐍 Python DQ Engine<br/><i>dq_engine.py · data_profiler.py</i>"]
+        P3["🐍 Python DQ Engine<br/><i>·dq_engine.py <br/> · data_profiler.py</i>"]
     end
     subgraph PUBLISH ["📤 Layer 4 — Publication"]
         PB1["🇨🇦 Statistics Canada CODR"]
