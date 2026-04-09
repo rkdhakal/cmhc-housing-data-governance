@@ -1,0 +1,2 @@
+Dataset,Scorecard_Date,Total_Records,Total_DQ_Rules,Rules_PASS,Rules_WARN,Rules_FAIL,Total_Rule_Failures,Overall_DQ_Score_Pct,Overall_Grade,Completeness_Score,Validity_Score,Uniqueness_Score,Accuracy_Score,Recommended_Action
+cmhc_housing_starts_2018_2023,2024-01-15,10800,12,8,4,0,761,99.41,B,98.44,99.56,100.0,N/A - requires benchmark data,"Escalate DQ-001, DQ-002, DQ-003, DQ-004 to Data Steward for remediation. Root cause analysis required for negative values in HOUSING_STARTS and AVERAGE_PRICE_CAD."
