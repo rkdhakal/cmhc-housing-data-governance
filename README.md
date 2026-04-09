@@ -185,6 +185,13 @@ graph LR
 | Uniqueness Score | 100.00% (A) |
 | **CDEs Requiring Remediation** | HOUSING_STARTS, AVERAGE_PRICE_CAD |
 
+### 📊 Live HTML Reports
+
+| Report | Description |
+|--------|-------------|
+| [**DQ Execution Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html) | 12 DQ rules execution results, root cause analysis, remediation actions |
+| [**Data Profile Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html) | Column-level profiling, domain validation, duplicate analysis, DQ scorecard |
+
 ---
 
 ## 🛠 Tools & Technologies Used
@@ -220,8 +227,8 @@ python report_generator.py
 ```
 
 **Outputs:**
-- `docs/data_profile_report.html` — Interactive data profiling report
-- `docs/dq_execution_report.html` — DQ rules execution report with root cause analysis
+- `docs/data_profile_report.html` — Interactive data profiling report ([view live](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html))
+- `docs/dq_execution_report.html` — DQ rules execution report with root cause analysis ([view live](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html))
 - `docs/data_lineage_diagram.mermaid` — Data lineage diagram (also rendered in README below)
 - `data/processed/cmhc_housing_starts_remediated.csv` — Cleaned dataset with DQ flags
 - `data/processed/dq_exceptions.csv` — Record-level exception log
