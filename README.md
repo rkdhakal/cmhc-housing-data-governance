@@ -28,7 +28,7 @@ It is designed to demonstrate the **full governance lifecycle** as practiced in 
 | What was done | Why it matters |
 |---|---|
 | Identified **761 data quality exceptions** across 2 Critical Data Elements (745 unique records) | These are the exact records that would produce incorrect housing starts reports and policy metrics if left undetected |
-| Built **12 executable DQ rules** with SQL logic across completeness, validity, and uniqueness dimensions | Replicates the rule design and validation workflow used in Informatica IDMC — same dimensions, same severity levels, same escalation logic |
+| Built **15 executable DQ rules** with SQL logic across completeness, validity, uniqueness, accuracy, and consistency dimensions | Replicates the rule design and validation workflow used in Informatica IDMC — same dimensions, same severity levels, same escalation logic |
 | Documented **complete 5-layer end-to-end lineage** from source permit offices to federal policy reports | Enables audit traceability — a regulator or data steward can trace any number in a published report back to its source system |
 | Identified **6 Critical Data Elements** with business justification and column-level lineage | CDEs are the foundation of any governance program — knowing which fields matter most determines where you invest DQ effort |
 | Established a **stewardship operating model** with RACI matrix and 4-level escalation framework | This is the people and process layer that most portfolio projects skip — governance isn't just rules, it's accountability |
@@ -40,7 +40,7 @@ It is designed to demonstrate the **full governance lifecycle** as practiced in 
 ## 📸 Screenshots
 
 ### DQ Execution Report
-> 12 rules executed with pass rates, severity levels, and root cause analysis for failures
+> 15 rules executed with pass rates, severity levels, and root cause analysis for failures
 
 ![DQ Execution Report](docs/dq_execution_report_screenshot.png)
 
@@ -136,7 +136,7 @@ graph LR
 - **4-level issue escalation matrix** (Low → Medium → High → Critical)
 - **CDE-level stewardship assignments** with review cycles and DQ thresholds
 
-### 4. Data Quality Rules (12 Rules, SQL)
+### 4. Data Quality Rules (15 Rules, SQL)
 
 | Rule ID | Rule Name | Dimension | Pass Rate | Status |
 |---------|-----------|-----------|-----------|--------|
@@ -152,6 +152,9 @@ graph LR
 | DQ-010 | Grain Uniqueness | Uniqueness | 100.00% | ✅ PASS |
 | DQ-011 | Reference Date Not Future | Validity | 100.00% | ✅ PASS |
 | DQ-012 | Status Code Validity | Validity | 100.00% | ✅ PASS |
+| DQ-013 | Housing Starts Accuracy — Statistical Range | Accuracy | 99.94% | ⚠ WARN |
+| DQ-014 | Average Price Accuracy — Statistical Range | Accuracy | 98.92% | ⚠ WARN |
+| DQ-015 | GEO and GEO_CODE Consistency | Consistency | 100.00% | ✅ PASS |
 
 Each rule includes: SQL logic, severity classification, CDE mapping, remediation guidance, and root cause documentation for failures.
 
@@ -159,15 +162,17 @@ Each rule includes: SQL logic, severity classification, CDE mapping, remediation
 
 | Metric | Value |
 |--------|-------|
-| **Overall DQ Score** | **99.41%** |
+| **Overall DQ Score** | **99.45%** |
 | Overall Grade | B |
 | Total Records | 10,800 |
-| Total Rules Executed | 12 |
-| Rules PASS / WARN / FAIL | 8 / 4 / 0 |
-| Total Rule Failures | 761 (745 unique records) |
+| Total Rules Executed | 15 |
+| Rules PASS / WARN / FAIL | 9 / 6 / 0 |
+| Total Rule Failures | 884 |
 | Completeness Score | 98.44% (B) |
 | Validity Score | 99.56% (A) |
 | Uniqueness Score | 100.00% (A) |
+| Accuracy Score | 99.43% (A) |
+| Consistency Score | 100.00% (A) |
 | **CDEs Requiring Remediation** | HOUSING_STARTS, AVERAGE_PRICE_CAD |
 
 ### 6. Root Cause Analysis
@@ -184,7 +189,7 @@ The DQ engine doesn't just flag failures — it diagnoses them:
 
 | Report | Description |
 |--------|-------------|
-| [**DQ Execution Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html) | 12 DQ rules execution results, root cause analysis by province and dwelling type, remediation actions |
+| [**DQ Execution Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html) | 15 DQ rules execution results, root cause analysis by province and dwelling type, remediation actions |
 | [**Data Profile Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html) | Column-level profiling, completeness rates, domain validation, outlier detection, duplicate analysis |
 
 ---
@@ -216,7 +221,7 @@ cmhc-housing-data-governance/
 │   └── stewardship_assignments.csv                  # CDE-level owner/steward/custodian assignments
 │
 ├── dq_rules/
-│   └── dq_rules_catalog.csv                         # 12 DQ rules (SQL logic, pass rates, severity)
+│   └── dq_rules_catalog.csv                         # 15 DQ rules (SQL logic, pass rates, severity)
 │
 ├── scorecard/
 │   ├── dq_scorecard_summary.csv                     # Overall DQ scorecard (score, grade, actions)
@@ -228,13 +233,13 @@ cmhc-housing-data-governance/
 │   └── profile_scorecard.csv                        # Profiling scorecard summary
 │
 ├── docs/
-│   ├── dq_rules_sql.sql                             # All 12 DQ rules as executable SQL
+│   ├── dq_rules_sql.sql                             # All 15 DQ rules as executable SQL
 │   ├── dq_execution_report.html                     # HTML report (live: link above)
 │   ├── data_profile_report.html                     # HTML report (live: link above)
 │   ├── data_lineage_diagram.mermaid                 # Mermaid source for lineage diagram
 │   └── data_lineage_diagram.png                     # Static PNG export
 │
-├── dq_engine.py            # DQ rules execution engine (runs 12 rules, remediates, generates report)
+├── dq_engine.py            # DQ rules execution engine (runs 15 rules, remediates, generates report)
 ├── data_profiler.py         # Automated data profiling (column stats, domain validation, duplicates)
 ├── report_generator.py      # Centralized HTML report generator
 ├── requirements.txt         # Python dependencies
@@ -278,7 +283,7 @@ pip install -r requirements.txt
 # Run the Data Profiler (column stats, domain validation, HTML report)
 python data_profiler.py
 
-# Run the DQ Engine (12 rules, remediation, scorecard, HTML report)
+# Run the DQ Engine (15 rules, remediation, scorecard, HTML report)
 python dq_engine.py
 
 # (Optional) Regenerate both HTML reports from saved CSVs
