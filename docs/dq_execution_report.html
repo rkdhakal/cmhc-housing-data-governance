@@ -29,19 +29,19 @@
 <body>
 <div class="header">
   <h1>⚙️ DQ Rules Execution Report — CMHC Housing Starts 2018–2023</h1>
-  <p>Author: Ram Krishna Dhakal &nbsp;|&nbsp; Generated: 2026-04-09 04:11 &nbsp;|&nbsp;
+  <p>Author: Ram Krishna Dhakal &nbsp;|&nbsp; Generated: 2026-05-30 09:06 &nbsp;|&nbsp;
      12 Rules Executed &nbsp;|&nbsp; Canadian Housing Data Governance & Quality Framework</p>
 </div>
 
 <div class="container">
 
   <div class="cards">
-    <div class="card"><div class="val">99.41%</div><div class="lbl">Overall DQ Score</div></div>
-    <div class="card"><div class="val">8</div><div class="lbl">Rules Passed</div></div>
-    <div class="card"><div class="val">4</div><div class="lbl">Rules Warning</div></div>
+    <div class="card"><div class="val">99.45%</div><div class="lbl">Overall DQ Score</div></div>
+    <div class="card"><div class="val">9</div><div class="lbl">Rules Passed</div></div>
+    <div class="card"><div class="val">6</div><div class="lbl">Rules Warning</div></div>
     <div class="card"><div class="val">0</div><div class="lbl">Rules Failed</div></div>
-    <div class="card"><div class="val">10,055</div><div class="lbl">Clean Records</div></div>
-    <div class="card"><div class="val">93.1%</div><div class="lbl">Records Clean</div></div>
+    <div class="card"><div class="val">0</div><div class="lbl">Clean Records</div></div>
+    <div class="card"><div class="val">0.0%</div><div class="lbl">Records Clean</div></div>
   </div>
 
   <div class="section">
@@ -171,6 +171,36 @@
                 <td>0</td>
                 <td><span style="background:#d5f5e3;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold">PASS</span></td>
                 <td style="font-size:11px;color:#555">Map to nearest valid status code. Blank (final) is default....</td>
+            </tr><tr>
+                <td>DQ-013</td>
+                <td>Housing Starts Accuracy — Statistical Range</td>
+                <td>Accuracy</td>
+                <td>HOUSING_STARTS</td>
+                <td>High</td>
+                <td>99.94%</td>
+                <td>6</td>
+                <td><span style="background:#fef9e7;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold">WARN</span></td>
+                <td style="font-size:11px;color:#555">Escalate to Data Steward. Cross-reference with municipal permit office records t...</td>
+            </tr><tr>
+                <td>DQ-014</td>
+                <td>Average Price Accuracy — Statistical Range</td>
+                <td>Accuracy</td>
+                <td>AVERAGE_PRICE_CAD</td>
+                <td>High</td>
+                <td>98.92%</td>
+                <td>117</td>
+                <td><span style="background:#fef9e7;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold">WARN</span></td>
+                <td style="font-size:11px;color:#555">Escalate to Data Steward. Verify against CMHC price survey raw data for the affe...</td>
+            </tr><tr>
+                <td>DQ-015</td>
+                <td>GEO and GEO_CODE Consistency</td>
+                <td>Consistency</td>
+                <td>GEO + GEO_CODE</td>
+                <td>Critical</td>
+                <td>100.0%</td>
+                <td>0</td>
+                <td><span style="background:#d5f5e3;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold">PASS</span></td>
+                <td style="font-size:11px;color:#555">Correct GEO_CODE using the authoritative GEO-to-GEO_CODE lookup table. Investiga...</td>
             </tr></tbody>
     </table>
   </div>
@@ -182,11 +212,11 @@
     <div class="info-box"><strong>DQ-001 & DQ-003:</strong> NULL values in HOUSING_STARTS and AVERAGE_PRICE_CAD are not auto-filled — these require Data Steward review and possible back-fill from source systems. Records flagged in exception log.</div>
     
         <h3>Negative HOUSING_STARTS — by Province</h3>
-        <table><thead><tr><th>Province</th><th>Count</th></tr></thead><tbody><tr><td>QC</td><td>37</td></tr><tr><td>AB</td><td>35</td></tr><tr><td>NS</td><td>35</td></tr><tr><td>NB</td><td>33</td></tr><tr><td>PE</td><td>31</td></tr><tr><td>NL</td><td>30</td></tr><tr><td>ON</td><td>29</td></tr><tr><td>MB</td><td>29</td></tr><tr><td>BC</td><td>26</td></tr><tr><td>SK</td><td>22</td></tr></tbody></table>
+        <table><thead><tr><th>Province</th><th>Count</th></tr></thead><tbody><tr><td>QC</td><td>37</td></tr><tr><td>AB</td><td>35</td></tr><tr><td>NS</td><td>35</td></tr><tr><td>NB</td><td>33</td></tr><tr><td>PE</td><td>31</td></tr><tr><td>NL</td><td>30</td></tr><tr><td>MB</td><td>29</td></tr><tr><td>ON</td><td>29</td></tr><tr><td>BC</td><td>26</td></tr><tr><td>SK</td><td>22</td></tr></tbody></table>
         <h3 style="margin-top:16px">Negative AVERAGE_PRICE_CAD — by Dwelling Type</h3>
         <table><thead><tr><th>Dwelling Type</th><th>Count</th></tr></thead><tbody><tr><td>Row House</td><td>27</td></tr><tr><td>Apartment - Under 5 storeys</td><td>26</td></tr><tr><td>Single-Detached</td><td>25</td></tr><tr><td>Semi-Detached</td><td>23</td></tr><tr><td>Apartment - 5+ storeys</td><td>16</td></tr></tbody></table>
         <h3 style="margin-top:16px">NULL HOUSING_STARTS — by Year</h3>
-        <table><thead><tr><th>Year</th><th>Count</th></tr></thead><tbody><tr><td>2020</td><td>39</td></tr><tr><td>2022</td><td>37</td></tr><tr><td>2019</td><td>33</td></tr><tr><td>2018</td><td>33</td></tr><tr><td>2021</td><td>32</td></tr><tr><td>2023</td><td>29</td></tr></tbody></table>
+        <table><thead><tr><th>Year</th><th>Count</th></tr></thead><tbody><tr><td>2020</td><td>39</td></tr><tr><td>2022</td><td>37</td></tr><tr><td>2018</td><td>33</td></tr><tr><td>2019</td><td>33</td></tr><tr><td>2021</td><td>32</td></tr><tr><td>2023</td><td>29</td></tr></tbody></table>
   </div>
 
   <div class="section">
