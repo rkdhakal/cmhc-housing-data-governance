@@ -117,7 +117,7 @@ def generate_dq_execution_report(df_results, scorecard_stats, rca, output_path=D
 <div class="header">
   <h1>⚙️ DQ Rules Execution Report — CMHC Housing Starts 2018–2023</h1>
   <p>Author: Ram Krishna Dhakal &nbsp;|&nbsp; Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")} &nbsp;|&nbsp;
-     12 Rules Executed &nbsp;|&nbsp; Canadian Housing Data Governance & Quality Framework</p>
+     15 Rules Executed &nbsp;|&nbsp; Canadian Housing Data Governance & Quality Framework</p>
 </div>
 
 <div class="container">
@@ -157,7 +157,7 @@ def generate_dq_execution_report(df_results, scorecard_stats, rca, output_path=D
       <tbody>
         <tr><td>data/processed/cmhc_housing_starts_remediated.csv</td><td>Cleaned dataset with DQ flags applied</td><td>{scorecard_stats['total']:,}</td></tr>
         <tr><td>data/processed/dq_exceptions.csv</td><td>All failed records with rule details and remediation guidance</td><td>See file</td></tr>
-        <tr><td>scorecard/dq_execution_scorecard.csv</td><td>Rule-level scorecard with pass rates</td><td>12 rules</td></tr>
+        <tr><td>scorecard/dq_execution_scorecard.csv</td><td>Rule-level scorecard with pass rates</td><td>15 rules</td></tr>
       </tbody>
     </table>
   </div>

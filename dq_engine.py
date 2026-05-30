@@ -485,6 +485,53 @@ def save_outputs(df_clean, df_results, df_exceptions, scorecard_stats):
     df_results.to_csv(SCORECARD_PATH, index=False)
     print(f"      ✓ Execution scorecard → {SCORECARD_PATH}")
 
+    # Auto-generate summary and by-dimension scorecards so they never go stale
+    _total_r = len(df_clean)
+    _passing  = int((df_results["Status"] == "PASS").sum())
+    _warning  = int((df_results["Status"] == "WARN").sum())
+    _failing  = int((df_results["Status"] == "FAIL").sum())
+    _overall  = round(df_results["Pass_Rate_Pct"].mean(), 2)
+
+    def _dim_score(dim):
+        rows = df_results[df_results["DQ_Dimension"] == dim]["Pass_Rate_Pct"]
+        return round(rows.mean(), 2) if len(rows) > 0 else None
+
+    pd.DataFrame([{
+        "Dataset": "cmhc_housing_starts_2018_2023",
+        "Scorecard_Date": datetime.now().strftime("%Y-%m-%d"),
+        "Total_Records": _total_r,
+        "Total_DQ_Rules": len(df_results),
+        "Rules_PASS": _passing, "Rules_WARN": _warning, "Rules_FAIL": _failing,
+        "Total_Rule_Failures": int(df_results["Records_Failed"].sum()),
+        "Overall_DQ_Score_Pct": _overall,
+        "Overall_Grade": "A" if _overall >= 99 else ("B" if _overall >= 95 else "C"),
+        "Completeness_Score": _dim_score("Completeness"),
+        "Validity_Score": _dim_score("Validity"),
+        "Uniqueness_Score": _dim_score("Uniqueness"),
+        "Accuracy_Score": _dim_score("Accuracy"),
+        "Consistency_Score": _dim_score("Consistency"),
+        "Recommended_Action": (
+            "Escalate DQ-001, DQ-002, DQ-003, DQ-004, DQ-013, DQ-014 to Data Steward. "
+            "Root cause analysis required for negative values and statistical outliers."
+        )
+    }]).to_csv("scorecard/dq_scorecard_summary.csv", index=False)
+    print(f"      ✓ Summary scorecard   → scorecard/dq_scorecard_summary.csv")
+
+    _dim_rows = []
+    for _dim, _grp in df_results.groupby("DQ_Dimension"):
+        _avg = round(_grp["Pass_Rate_Pct"].mean(), 2)
+        _dim_rows.append({
+            "DQ_Dimension": _dim, "Rules_Count": len(_grp),
+            "Avg_Pass_Rate": _avg, "Total_Failed": int(_grp["Records_Failed"].sum()),
+            "Rules_Passing": int((_grp["Status"] == "PASS").sum()),
+            "Rules_Warning": int((_grp["Status"] == "WARN").sum()),
+            "Rules_Failing": int((_grp["Status"] == "FAIL").sum()),
+            "Dimension_Score": _avg,
+            "Dimension_Grade": "A" if _avg >= 99 else ("B" if _avg >= 95 else "C")
+        })
+    pd.DataFrame(_dim_rows).to_csv("scorecard/dq_scorecard_by_dimension.csv", index=False)
+    print(f"      ✓ By-dimension scorecard → scorecard/dq_scorecard_by_dimension.csv")
+
 
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
