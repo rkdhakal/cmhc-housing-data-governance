@@ -1,4 +1,4 @@
-import streamlit as st
+﻿import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -123,7 +123,7 @@ REQUIRED_COLUMNS = [
 ]
 
 GITHUB_REPO  = "https://github.com/rkdhakal/cmhc-housing-data-governance"
-LIVE_REPORT  = "https://rkdhakal.github.io/cmhc-housing-data-governance"
+LIVE_REPORT  = "https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html"
 
 # ── Data loaders ──────────────────────────────────────────────────────────────
 
@@ -944,3 +944,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

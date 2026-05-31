@@ -1,4 +1,4 @@
-# 🏠 Canadian Housing Data Governance & Quality Framework
+﻿# 🏠 Canadian Housing Data Governance & Quality Framework
 
 **An end-to-end data governance and data quality framework applied to Canadian housing data — demonstrating metadata cataloging, data lineage, stewardship, DQ rule execution, and quality scorecards.**
 
@@ -27,7 +27,7 @@ It is designed to demonstrate the **full governance lifecycle** as practiced in 
 
 | What was done | Why it matters |
 |---|---|
-| Identified **761 data quality exceptions** across 2 Critical Data Elements (745 unique records) | These are the exact records that would produce incorrect housing starts reports and policy metrics if left undetected |
+| Identified **884 data quality exceptions** across 2 Critical Data Elements (751 unique records) | These are the exact records that would produce incorrect housing starts reports and policy metrics if left undetected |
 | Built **15 executable DQ rules** with SQL logic across completeness, validity, uniqueness, accuracy, and consistency dimensions | Replicates the rule design and validation workflow used in Informatica IDMC — same dimensions, same severity levels, same escalation logic |
 | Documented **complete 5-layer end-to-end lineage** from source permit offices to federal policy reports | Enables audit traceability — a regulator or data steward can trace any number in a published report back to its source system |
 | Identified **6 Critical Data Elements** with business justification and column-level lineage | CDEs are the foundation of any governance program — knowing which fields matter most determines where you invest DQ effort |
@@ -190,6 +190,7 @@ The DQ engine doesn't just flag failures — it diagnoses them:
 | Report | Description |
 |--------|-------------|
 | [**DQ Execution Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html) | 15 DQ rules execution results, root cause analysis by province and dwelling type, remediation actions |
+| [**Interactive DQ Dashboard**](https://rkdhakal-cmhc-housing-data-governance-app-kctmvs.streamlit.app) | Live Streamlit app — filter rules, explore exceptions, upload your own data |
 | [**Data Profile Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html) | Column-level profiling, completeness rates, domain validation, outlier detection, duplicate analysis |
 
 ---
@@ -242,6 +243,7 @@ cmhc-housing-data-governance/
 ├── dq_engine.py            # DQ rules execution engine (runs 15 rules, remediates, generates report)
 ├── data_profiler.py         # Automated data profiling (column stats, domain validation, duplicates)
 ├── report_generator.py      # Centralized HTML report generator
+├── app.py                   # Streamlit interactive DQ dashboard (4 tabs)
 ├── requirements.txt         # Python dependencies
 └── README.md
 ```
@@ -253,7 +255,7 @@ cmhc-housing-data-governance/
 | Tool | How It's Used |
 |------|---------------|
 | **Python (pandas, numpy)** | Data profiling, DQ rule execution, scorecard calculation, report generation |
-| **SQL** | All 12 DQ rules written as executable SQL — same pattern used for Informatica IDMC rule validation at CMHC |
+| **SQL** | All 15 DQ rules written as executable SQL — same pattern used for Informatica IDMC rule validation at CMHC |
 | **Collibra** | Metadata catalog structure, business glossary, stewardship workflows, and governance roles in this project follow the same patterns used in Collibra Data Intelligence Cloud at CMHC |
 | **Informatica IDMC** | DQ rule design, exception management, and severity/remediation patterns in this project mirror the IDMC rule engine workflows validated during the CMHC internship |
 | **CSV / Excel-ready outputs** | All governance artifacts are exportable to Power BI dashboards or importable into enterprise catalog platforms |
@@ -288,6 +290,9 @@ python dq_engine.py
 
 # (Optional) Regenerate both HTML reports from saved CSVs
 python report_generator.py
+
+# Launch the interactive Streamlit dashboard
+streamlit run app.py
 ```
 
 **Outputs:**
@@ -295,6 +300,7 @@ python report_generator.py
 - `docs/data_profile_report.html` — Data profiling report ([view live](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html))
 - `data/processed/cmhc_housing_starts_remediated.csv` — Cleaned dataset with DQ flags
 - `data/processed/dq_exceptions.csv` — Record-level exception log
+- Interactive dashboard at `http://localhost:8501` (run `streamlit run app.py`)
 
 ---
 
