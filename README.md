@@ -293,13 +293,10 @@ streamlit run app.py
 
 This project demonstrates governance patterns. In a real enterprise implementation, I would add:
 
-- **Automated scheduling** — DQ rules running on a cron or orchestrator (Airflow, Azure Data Factory) against live data, not a static CSV
-- **Live catalog API integration** — Pushing metadata and DQ scores directly into Collibra or Informatica CDGC via REST API, rather than CSV exports
-- **Role-based access controls** — Enforcing who can view, edit, or approve data assets, stewardship assignments, and DQ rule changes
-- **DQ trend monitoring** — Tracking quality scores over time to detect degradation patterns, not just point-in-time snapshots
-- **AI-assisted anomaly detection** — Using statistical models or ML to flag unexpected data patterns before they become rule failures
-- **Data observability layer** — Cross-system reconciliation checks (source vs. staging vs. warehouse) like the 4-hop validation I built at CMHC
-- **Incident management integration** — Connecting DQ exceptions to ticketing systems (ServiceNow, Jira) for formal tracking and SLA-based resolution
+- **Automated scheduling** — Run dq_engine.py on a monthly schedule via Airflow or Azure Data Factory, triggered when new CMHC data arrives, rather than executing manually against a static CSV
+- **Live Collibra integration** — Push DQ scores, rule results, and exception counts directly into Collibra via REST API after each run, so the catalog reflects current data quality without manual CSV imports
+- **DQ trend monitoring** — Append each scorecard run to a history table and plot scores over time in the dashboard, so stewards can see whether quality is improving, degrading, or stable across months
+- **Incident management integration** — Route FAIL and WARN exceptions automatically into ServiceNow or Jira with rule ID, severity, CDE, and assigned steward — replacing the current manual escalation step with a tracked, SLA-bound workflow
 
 ---
 
