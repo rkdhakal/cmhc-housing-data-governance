@@ -193,141 +193,174 @@ def badge_html(status: str) -> str:
 
 
 # ── DQ Rule implementations (for Tab 4) ──────────────────────────────────────
+# These domain values must stay in sync with dq_engine.py
+_VALID_GEO_CODES = {"ON","BC","AB","QC","MB","SK","NS","NB","NL","PE","NT","YT","NU"}
+_VALID_DWELLING  = {"Single-Detached","Semi-Detached","Row House",
+                    "Apartment - 5+ storeys","Apartment - Under 5 storeys"}
+_VALID_MARKETS   = {"Homeowner","Rental","Condominium"}
+_VALID_STATUS    = {"","E","F","r"}
+_GEO_MAPPING = {
+    "Ontario":"ON","British Columbia":"BC","Alberta":"AB","Quebec":"QC",
+    "Manitoba":"MB","Saskatchewan":"SK","Nova Scotia":"NS","New Brunswick":"NB",
+    "Newfoundland and Labrador":"NL","Prince Edward Island":"PE",
+    "Northwest Territories":"NT","Yukon":"YT","Nunavut":"NU",
+}
 
-def run_dq_rules(df: pd.DataFrame) -> pd.DataFrame:
+
+def run_dq_rules(df: pd.DataFrame):
     """
-    Apply the 15 DQ rules to an uploaded dataframe.
-    Returns a scorecard dataframe in the same shape as dq_execution_scorecard.csv.
+    Apply all 15 DQ rules (identical logic to dq_engine.py) to an uploaded dataframe.
+    Returns (scorecard_df, n_unique_failed_records).
     """
+    import numpy as np
     total = len(df)
     results = []
+    failed_indices: set = set()
 
-    def record(rule_id, rule_name, dimension, cde, description, severity, passed, failed):
+    def record(rule_id, rule_name, dimension, cde, description, severity, fail_mask):
+        arr = fail_mask.values if hasattr(fail_mask, "values") else np.array(fail_mask)
+        failed = int(arr.sum())
+        passed = total - failed
         pass_rate = round(100 * passed / total, 2) if total > 0 else 0.0
-        if pass_rate >= 99:
-            status = "PASS"
-        elif pass_rate >= 95:
-            status = "WARN"
-        else:
-            status = "FAIL"
+        status = "PASS" if pass_rate == 100 else ("WARN" if pass_rate >= 95 else "FAIL")
+        failed_indices.update(df.index[arr].tolist())
         results.append({
-            "Rule_ID": rule_id,
-            "Rule_Name": rule_name,
-            "DQ_Dimension": dimension,
-            "CDE_Affected": cde,
-            "Description": description,
-            "Severity": severity,
-            "Total_Records": total,
-            "Records_Passed": passed,
-            "Records_Failed": failed,
-            "Pass_Rate_Pct": pass_rate,
+            "Rule_ID": rule_id, "Rule_Name": rule_name,
+            "DQ_Dimension": dimension, "CDE_Affected": cde,
+            "Description": description, "Severity": severity,
+            "Total_Records": total, "Records_Passed": passed,
+            "Records_Failed": failed, "Pass_Rate_Pct": pass_rate,
             "Status": status,
             "Remediation_Action": "Review flagged records and correct source data.",
         })
 
-    # Rule 1 – Completeness: HOUSING_STARTS not null
-    mask = df["HOUSING_STARTS"].notna()
-    record("DQ001", "Housing Starts Not Null", "Completeness", "HOUSING_STARTS",
-           "HOUSING_STARTS must not be null.", "Critical", mask.sum(), (~mask).sum())
+    # STATUS helper (column may be absent in user uploads)
+    status_col = df["STATUS"].fillna("") if "STATUS" in df.columns else pd.Series([""] * total, index=df.index)
 
-    # Rule 2 – Completeness: AVERAGE_PRICE_CAD not null
-    mask = df["AVERAGE_PRICE_CAD"].notna()
-    record("DQ002", "Average Price Not Null", "Completeness", "AVERAGE_PRICE_CAD",
-           "AVERAGE_PRICE_CAD must not be null.", "Critical", mask.sum(), (~mask).sum())
+    # DQ-001: HOUSING_STARTS completeness
+    record("DQ-001", "Housing Starts Completeness", "Completeness", "HOUSING_STARTS",
+           "HOUSING_STARTS must not be NULL.", "High",
+           df["HOUSING_STARTS"].isnull())
 
-    # Rule 3 – Completeness: REF_DATE not null
-    mask = df["REF_DATE"].notna()
-    record("DQ003", "REF_DATE Not Null", "Completeness", "REF_DATE",
-           "REF_DATE must not be null.", "High", mask.sum(), (~mask).sum())
+    # DQ-002: HOUSING_STARTS non-negative
+    record("DQ-002", "Housing Starts Non-Negative", "Validity", "HOUSING_STARTS",
+           "HOUSING_STARTS must be >= 0. Negative values are physically impossible.", "Critical",
+           df["HOUSING_STARTS"].fillna(0) < 0)
 
-    # Rule 4 – Completeness: GEO not null
-    mask = df["GEO"].notna()
-    record("DQ004", "GEO Not Null", "Completeness", "GEO",
-           "GEO must not be null.", "High", mask.sum(), (~mask).sum())
+    # DQ-003: AVERAGE_PRICE_CAD completeness (non-suppressed records only)
+    record("DQ-003", "Average Price Completeness", "Completeness", "AVERAGE_PRICE_CAD",
+           "AVERAGE_PRICE_CAD must not be NULL on non-suppressed records.", "Medium",
+           df["AVERAGE_PRICE_CAD"].isnull() & (status_col != "F"))
 
-    # Rule 5 – Validity: HOUSING_STARTS >= 0
-    num = pd.to_numeric(df["HOUSING_STARTS"], errors="coerce")
-    mask = num.notna() & (num >= 0)
-    record("DQ005", "Housing Starts Non-Negative", "Validity", "HOUSING_STARTS",
-           "HOUSING_STARTS must be >= 0.", "Critical", mask.sum(), (~mask).sum())
+    # DQ-004: AVERAGE_PRICE_CAD non-negative
+    record("DQ-004", "Average Price Non-Negative", "Validity", "AVERAGE_PRICE_CAD",
+           "AVERAGE_PRICE_CAD must be > 0. Negative prices are invalid.", "Critical",
+           df["AVERAGE_PRICE_CAD"].fillna(0) < 0)
 
-    # Rule 6 – Validity: AVERAGE_PRICE_CAD >= 0
-    num = pd.to_numeric(df["AVERAGE_PRICE_CAD"], errors="coerce")
-    mask = num.notna() & (num >= 0)
-    record("DQ006", "Average Price Non-Negative", "Validity", "AVERAGE_PRICE_CAD",
-           "AVERAGE_PRICE_CAD must be >= 0.", "Critical", mask.sum(), (~mask).sum())
+    # DQ-005: AVERAGE_PRICE_CAD ceiling
+    record("DQ-005", "Average Price Ceiling Check", "Validity", "AVERAGE_PRICE_CAD",
+           "AVERAGE_PRICE_CAD must not exceed $10,000,000.", "Medium",
+           df["AVERAGE_PRICE_CAD"].fillna(0) > 10_000_000)
 
-    # Rule 7 – Validity: REF_DATE parseable
-    def parseable(v):
-        try:
-            pd.to_datetime(v)
-            return True
-        except Exception:
-            return False
+    # DQ-006: GEO_CODE referential integrity
+    geo_code = df["GEO_CODE"] if "GEO_CODE" in df.columns else pd.Series([""] * total, index=df.index)
+    record("DQ-006", "GEO_CODE Referential Integrity", "Validity", "GEO_CODE",
+           "GEO_CODE must be a valid Canadian province/territory code.", "High",
+           ~geo_code.isin(_VALID_GEO_CODES))
 
-    mask = df["REF_DATE"].apply(lambda x: parseable(x) if pd.notna(x) else False)
-    record("DQ007", "REF_DATE Parseable", "Validity", "REF_DATE",
-           "REF_DATE must be a valid date.", "High", mask.sum(), (~mask).sum())
+    # DQ-007: DWELLING_TYPE domain validity
+    record("DQ-007", "Dwelling Type Domain Validity", "Validity", "DWELLING_TYPE",
+           "DWELLING_TYPE must be one of 5 approved categories.", "High",
+           ~df["DWELLING_TYPE"].isin(_VALID_DWELLING))
 
-    # Rule 8 – Validity: DWELLING_TYPE in known set
-    valid_types = {
-        "Single-detached", "Semi-detached", "Row", "Apartment",
-        "All types", "Other", "Duplex",
-    }
-    mask = df["DWELLING_TYPE"].isin(valid_types)
-    record("DQ008", "Dwelling Type Valid", "Validity", "DWELLING_TYPE",
-           "DWELLING_TYPE must be a recognised category.", "High", mask.sum(), (~mask).sum())
+    # DQ-008: INTENDED_MARKET domain validity
+    record("DQ-008", "Intended Market Domain Validity", "Validity", "INTENDED_MARKET",
+           "INTENDED_MARKET must be one of: Homeowner, Rental, Condominium.", "High",
+           ~df["INTENDED_MARKET"].isin(_VALID_MARKETS))
 
-    # Rule 9 – Validity: INTENDED_MARKET in known set
-    valid_markets = {"Rental", "Ownership", "Condominium", "Co-operative", "All markets"}
-    mask = df["INTENDED_MARKET"].isin(valid_markets)
-    record("DQ009", "Intended Market Valid", "Validity", "INTENDED_MARKET",
-           "INTENDED_MARKET must be a recognised category.", "Medium", mask.sum(), (~mask).sum())
+    # DQ-009: REF_DATE format YYYY-MM
+    record("DQ-009", "Reference Date Format", "Validity", "REF_DATE",
+           "REF_DATE must follow YYYY-MM format.", "Medium",
+           ~df["REF_DATE"].astype(str).str.match(r"^\d{4}-\d{2}$"))
 
-    # Rule 10 – Accuracy: AVERAGE_PRICE_CAD reasonable range (> 50k and < 5M)
-    num = pd.to_numeric(df["AVERAGE_PRICE_CAD"], errors="coerce")
-    mask = num.isna() | ((num > 50_000) & (num < 5_000_000))
-    record("DQ010", "Price In Reasonable Range", "Accuracy", "AVERAGE_PRICE_CAD",
-           "AVERAGE_PRICE_CAD should be between $50K and $5M.", "Medium",
-           mask.sum(), (~mask).sum())
+    # DQ-010: Grain uniqueness
+    grain_cols = [c for c in ["REF_DATE","GEO_CODE","DWELLING_TYPE","INTENDED_MARKET"] if c in df.columns]
+    dup_mask = df.duplicated(subset=grain_cols, keep=False) if grain_cols else pd.Series([False]*total, index=df.index)
+    record("DQ-010", "Grain Uniqueness", "Uniqueness",
+           "REF_DATE+GEO_CODE+DWELLING_TYPE+INTENDED_MARKET",
+           "Each grain combination (REF_DATE + GEO_CODE + DWELLING_TYPE + INTENDED_MARKET) must be unique.", "High",
+           dup_mask)
 
-    # Rule 11 – Accuracy: HOUSING_STARTS reasonable (<= 50,000 per record)
-    num = pd.to_numeric(df["HOUSING_STARTS"], errors="coerce")
-    mask = num.isna() | (num <= 50_000)
-    record("DQ011", "Housing Starts Reasonable", "Accuracy", "HOUSING_STARTS",
-           "HOUSING_STARTS should not exceed 50,000 per record.", "Medium",
-           mask.sum(), (~mask).sum())
+    # DQ-011: REF_DATE not future
+    current_month = datetime.now().strftime("%Y-%m")
+    record("DQ-011", "Reference Date Not Future", "Validity", "REF_DATE",
+           "REF_DATE must not be after the current month.", "Medium",
+           df["REF_DATE"].astype(str) > current_month)
 
-    # Rule 12 – Uniqueness: no exact duplicate rows
-    dup_mask = df.duplicated(keep=False)
-    record("DQ012", "No Duplicate Records", "Uniqueness", "ALL_CDES",
-           "No two rows should be identical.", "High",
-           (~dup_mask).sum(), dup_mask.sum())
+    # DQ-012: STATUS code validity
+    record("DQ-012", "Status Code Validity", "Validity", "STATUS",
+           "STATUS must be blank, 'E', 'F', or 'r'.", "Low",
+           ~status_col.isin(_VALID_STATUS))
 
-    # Rule 13 – Consistency: REF_DATE within 2018–2023
-    try:
-        dates = pd.to_datetime(df["REF_DATE"], errors="coerce")
-        mask = dates.isna() | ((dates.dt.year >= 2018) & (dates.dt.year <= 2023))
-    except Exception:
-        mask = pd.Series([True] * total)
-    record("DQ013", "REF_DATE In Expected Range", "Consistency", "REF_DATE",
-           "REF_DATE should fall within 2018–2023.", "High", mask.sum(), (~mask).sum())
+    # DQ-013: HOUSING_STARTS accuracy — statistical range (province z-score)
+    if "GEO_CODE" in df.columns and df["HOUSING_STARTS"].notna().any():
+        prov_hs = (
+            df[df["HOUSING_STARTS"].notna()]
+            .groupby("GEO_CODE")["HOUSING_STARTS"]
+            .agg(["mean","std"]).reset_index()
+            .rename(columns={"mean":"hs_mean","std":"hs_std"})
+        )
+        df_013 = df.merge(prov_hs, on="GEO_CODE", how="left")
+        mask_013 = (
+            (df_013["HOUSING_STARTS"] > 20_000) |
+            (df_013["HOUSING_STARTS"] > df_013["hs_mean"] + 3 * df_013["hs_std"])
+        ).fillna(False)
+        mask_013.index = df.index
+    else:
+        mask_013 = pd.Series([False]*total, index=df.index)
+    record("DQ-013", "Housing Starts Accuracy — Statistical Range", "Accuracy", "HOUSING_STARTS",
+           "HOUSING_STARTS must not exceed 20,000 or mean + 3 std dev for its province.", "High",
+           mask_013)
 
-    # Rule 14 – Consistency: GEO_CODE not null when GEO is present
-    mask = ~(df["GEO"].notna() & df["GEO_CODE"].isna()) if "GEO_CODE" in df.columns else pd.Series([True] * total)
-    record("DQ014", "GEO_CODE Present With GEO", "Consistency", "GEO_CODE",
-           "When GEO is populated, GEO_CODE must also be populated.", "Medium",
-           mask.sum(), (~mask).sum())
+    # DQ-014: AVERAGE_PRICE_CAD accuracy — statistical range
+    if "GEO_CODE" in df.columns and df["AVERAGE_PRICE_CAD"].notna().any():
+        prov_pr = (
+            df[df["AVERAGE_PRICE_CAD"].notna()]
+            .groupby("GEO_CODE")["AVERAGE_PRICE_CAD"]
+            .agg(["mean","std"]).reset_index()
+            .rename(columns={"mean":"price_mean","std":"price_std"})
+        )
+        df_014 = df.merge(prov_pr, on="GEO_CODE", how="left")
+        mask_014 = (
+            df_014["AVERAGE_PRICE_CAD"].notna() &
+            (
+                (df_014["AVERAGE_PRICE_CAD"] < 100_000) |
+                (df_014["AVERAGE_PRICE_CAD"] > 3_000_000) |
+                (df_014["AVERAGE_PRICE_CAD"] > df_014["price_mean"] + 3 * df_014["price_std"])
+            )
+        ).fillna(False)
+        mask_014.index = df.index
+    else:
+        mask_014 = pd.Series([False]*total, index=df.index)
+    record("DQ-014", "Average Price Accuracy — Statistical Range", "Accuracy", "AVERAGE_PRICE_CAD",
+           "AVERAGE_PRICE_CAD must be between $100,000 and $3,000,000 and not exceed mean + 3 std dev for its province.", "High",
+           mask_014)
 
-    # Rule 15 – Completeness: DWELLING_TYPE not null
-    mask = df["DWELLING_TYPE"].notna()
-    record("DQ015", "Dwelling Type Not Null", "Completeness", "DWELLING_TYPE",
-           "DWELLING_TYPE must not be null.", "High", mask.sum(), (~mask).sum())
+    # DQ-015: GEO and GEO_CODE consistency
+    if "GEO" in df.columns and "GEO_CODE" in df.columns:
+        expected = df["GEO"].map(_GEO_MAPPING)
+        mask_015 = expected.notna() & (df["GEO_CODE"] != expected)
+    else:
+        mask_015 = pd.Series([False]*total, index=df.index)
+    record("DQ-015", "GEO and GEO_CODE Consistency", "Consistency", "GEO + GEO_CODE",
+           "GEO (full province name) and GEO_CODE (2-letter code) must always refer to the same province.", "Critical",
+           mask_015)
 
-    return pd.DataFrame(results)
+    return pd.DataFrame(results), len(failed_indices)
 
 
-def compute_summary_from_scorecard(scorecard_df: pd.DataFrame, total_records: int) -> dict:
+def compute_summary_from_scorecard(scorecard_df: pd.DataFrame, total_records: int,
+                                    n_unique_failed: int = None) -> dict:
     """Derive summary metrics from a run_dq_rules() result."""
     n_pass = int((scorecard_df["Status"] == "PASS").sum())
     n_warn = int((scorecard_df["Status"] == "WARN").sum())
@@ -349,7 +382,9 @@ def compute_summary_from_scorecard(scorecard_df: pd.DataFrame, total_records: in
         sub = scorecard_df[scorecard_df["DQ_Dimension"] == dim]
         dim_scores[dim] = round(sub["Pass_Rate_Pct"].mean(), 1) if len(sub) > 0 else 100.0
 
-    clean_pct = round(100 * (total_records - total_failed) / total_records, 1) if total_records > 0 else 100.0
+    # Use unique failed record count (not sum of rule failures) to avoid >100% clean bug
+    n_failed_unique = n_unique_failed if n_unique_failed is not None else total_failed
+    clean_pct = round(100 * (total_records - n_failed_unique) / total_records, 1) if total_records > 0 else 100.0
 
     return {
         "total_records": total_records,
@@ -862,8 +897,8 @@ def tab_run_your_data():
     )
 
     with st.spinner("Running 15 DQ rules…"):
-        result_scorecard = run_dq_rules(user_df)
-        summary_dict     = compute_summary_from_scorecard(result_scorecard, len(user_df))
+        result_scorecard, n_unique_failed = run_dq_rules(user_df)
+        summary_dict = compute_summary_from_scorecard(result_scorecard, len(user_df), n_unique_failed)
 
     st.markdown("---")
     st.markdown('<p class="section-heading">Your DQ Scorecard</p>', unsafe_allow_html=True)
