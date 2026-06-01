@@ -5,7 +5,7 @@
 **Author:** Ram Krishna Dhakal  
 **Tools:** Python · SQL · Collibra · Informatica IDMC  
 **Dataset:** CMHC Housing Starts — Canada (2018–2023) | 10,800 records · 16 columns · 10 provinces  
-**Live Reports:** [DQ Execution Report](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html) · [Data Profile Report](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html)
+**Live Dashboard:** [Interactive DQ Dashboard](https://cmhc-housing-data-governance-zaslgtkfkxi5n5agrz87th.streamlit.app)
 
 ---
 
@@ -27,29 +27,31 @@ It is designed to demonstrate the **full governance lifecycle** as practiced in 
 
 | What was done | Why it matters |
 |---|---|
-| Identified **761 data quality exceptions** across 2 Critical Data Elements (745 unique records) | These are the exact records that would produce incorrect housing starts reports and policy metrics if left undetected |
-| Built **12 executable DQ rules** with SQL logic across completeness, validity, and uniqueness dimensions | Replicates the rule design and validation workflow used in Informatica IDMC — same dimensions, same severity levels, same escalation logic |
+| Identified **884 data quality exceptions** across 2 Critical Data Elements (751 unique records) | These are the exact records that would produce incorrect housing starts reports and policy metrics if left undetected |
+| Built **15 executable DQ rules** with SQL logic across completeness, validity, uniqueness, accuracy, and consistency dimensions | Replicates the rule design and validation workflow used in Informatica IDMC — same dimensions, same severity levels, same escalation logic |
 | Documented **complete 5-layer end-to-end lineage** from source permit offices to federal policy reports | Enables audit traceability — a regulator or data steward can trace any number in a published report back to its source system |
 | Identified **6 Critical Data Elements** with business justification and column-level lineage | CDEs are the foundation of any governance program — knowing which fields matter most determines where you invest DQ effort |
 | Established a **stewardship operating model** with RACI matrix and 4-level escalation framework | This is the people and process layer that most portfolio projects skip — governance isn't just rules, it's accountability |
 | Produced **catalog artifacts compatible with Collibra Data Intelligence Cloud** | The CSV-based catalog, glossary, and stewardship files can be directly imported into enterprise governance platforms |
-| Built **automated profiling** replicating Informatica IDMC profiling capabilities | Column-level stats, null analysis, domain validation, outlier detection, and duplicate checks — all in a single Python script |
+| Built an **interactive Streamlit DQ dashboard** with live scorecard, exception explorer, and custom dataset validation | Replicates the governance reporting and steward review workflow used in IDMC and Collibra |
 
 ---
 
-## 📸 Screenshots
+## 📊 Interactive Dashboard
 
-### DQ Execution Report
-> 12 rules executed with pass rates, severity levels, and root cause analysis for failures
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cmhc-housing-data-governance-zaslgtkfkxi5n5agrz87th.streamlit.app)
 
-![DQ Execution Report](docs/dq_execution_report_screenshot.png)
+| Tab | What it shows |
+|-----|---------------|
+| **Executive Scorecard** | Overall DQ score, dimension scores, rule-by-rule pass rates, CDE table |
+| **DQ Rules** | Filterable rule catalogue with full detail, SQL logic, and CSV download |
+| **Exception Explorer** | 884 exceptions filterable by dimension, rule, province, dwelling type |
+| **Run on Your Data** | Upload any CMHC-format CSV and run all 15 rules live |
 
-### Data Profile Report
-> Column-level profiling with completeness, domain validation, and duplicate analysis
+---
 
-![Data Profile Report](docs/data_profile_report_screenshot.png)
+## 📸 Data Lineage Diagram
 
-### Data Lineage Diagram
 > 5-layer source-to-consumption lineage with CDE tracking
 
 ![Data Lineage](docs/data_lineage_diagram.png)
@@ -86,7 +88,7 @@ graph LR
     subgraph PROCESS ["⚙️ Layer 3 — Processing"]
         P1["🔍 Informatica IDMC <br/> DQ Engine"]
         P2["📚 Collibra Data <br/>Intelligence Cloud"]
-        P3["🐍 Python DQ Engine<br/><i>·dq_engine.py <br/> · data_profiler.py</i>"]
+        P3["🐍 Python DQ Engine<br/><i>dq_engine.py · app.py</i>"]
     end
     subgraph PUBLISH ["📤 Layer 4 — Publication"]
         PB1["🇨🇦 Statistics Canada CODR"]
@@ -136,7 +138,7 @@ graph LR
 - **4-level issue escalation matrix** (Low → Medium → High → Critical)
 - **CDE-level stewardship assignments** with review cycles and DQ thresholds
 
-### 4. Data Quality Rules (12 Rules, SQL)
+### 4. Data Quality Rules (15 Rules, SQL)
 
 | Rule ID | Rule Name | Dimension | Pass Rate | Status |
 |---------|-----------|-----------|-----------|--------|
@@ -152,6 +154,9 @@ graph LR
 | DQ-010 | Grain Uniqueness | Uniqueness | 100.00% | ✅ PASS |
 | DQ-011 | Reference Date Not Future | Validity | 100.00% | ✅ PASS |
 | DQ-012 | Status Code Validity | Validity | 100.00% | ✅ PASS |
+| DQ-013 | Housing Starts Accuracy — Statistical Range | Accuracy | 99.94% | ⚠ WARN |
+| DQ-014 | Average Price Accuracy — Statistical Range | Accuracy | 98.92% | ⚠ WARN |
+| DQ-015 | GEO and GEO_CODE Consistency | Consistency | 100.00% | ✅ PASS |
 
 Each rule includes: SQL logic, severity classification, CDE mapping, remediation guidance, and root cause documentation for failures.
 
@@ -159,15 +164,18 @@ Each rule includes: SQL logic, severity classification, CDE mapping, remediation
 
 | Metric | Value |
 |--------|-------|
-| **Overall DQ Score** | **99.41%** |
-| Overall Grade | B |
+| **Overall DQ Score** | **99.45%** |
+| Overall Grade | A |
 | Total Records | 10,800 |
-| Total Rules Executed | 12 |
-| Rules PASS / WARN / FAIL | 8 / 4 / 0 |
-| Total Rule Failures | 761 (745 unique records) |
+| Total Rules Executed | 15 |
+| Rules PASS / WARN / FAIL | 9 / 6 / 0 |
+| Total Rule Failures | 884 |
+| Clean Records | 93.0% (751 unique records affected) |
 | Completeness Score | 98.44% (B) |
 | Validity Score | 99.56% (A) |
 | Uniqueness Score | 100.00% (A) |
+| Accuracy Score | 99.43% (A) |
+| Consistency Score | 100.00% (A) |
 | **CDEs Requiring Remediation** | HOUSING_STARTS, AVERAGE_PRICE_CAD |
 
 ### 6. Root Cause Analysis
@@ -177,15 +185,6 @@ The DQ engine doesn't just flag failures — it diagnoses them:
 - **DQ-002 (Negative Housing Starts):** Traced to manual data entry errors in source municipal building permit systems. 307 records affected across all 10 provinces, with QC (37), AB (35), and NS (35) having the highest counts.
 - **DQ-004 (Negative Average Price):** Traced to a sign-flip error during CPI adjustment in the CMHC Housing Price Survey pipeline. 117 records affected, distributed across all dwelling types.
 - **DQ-001 & DQ-003 (NULL values):** 203 and 134 null records respectively — flagged for steward review and back-fill from source systems, not auto-remediated.
-
----
-
-## 📊 Live HTML Reports
-
-| Report | Description |
-|--------|-------------|
-| [**DQ Execution Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html) | 12 DQ rules execution results, root cause analysis by province and dwelling type, remediation actions |
-| [**Data Profile Report**](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html) | Column-level profiling, completeness rates, domain validation, outlier detection, duplicate analysis |
 
 ---
 
@@ -216,7 +215,7 @@ cmhc-housing-data-governance/
 │   └── stewardship_assignments.csv                  # CDE-level owner/steward/custodian assignments
 │
 ├── dq_rules/
-│   └── dq_rules_catalog.csv                         # 12 DQ rules (SQL logic, pass rates, severity)
+│   └── dq_rules_catalog.csv                         # 15 DQ rules (SQL logic, pass rates, severity)
 │
 ├── scorecard/
 │   ├── dq_scorecard_summary.csv                     # Overall DQ scorecard (score, grade, actions)
@@ -228,15 +227,12 @@ cmhc-housing-data-governance/
 │   └── profile_scorecard.csv                        # Profiling scorecard summary
 │
 ├── docs/
-│   ├── dq_rules_sql.sql                             # All 12 DQ rules as executable SQL
-│   ├── dq_execution_report.html                     # HTML report (live: link above)
-│   ├── data_profile_report.html                     # HTML report (live: link above)
+│   ├── dq_rules_sql.sql                             # All 15 DQ rules as executable SQL
 │   ├── data_lineage_diagram.mermaid                 # Mermaid source for lineage diagram
 │   └── data_lineage_diagram.png                     # Static PNG export
 │
-├── dq_engine.py            # DQ rules execution engine (runs 12 rules, remediates, generates report)
-├── data_profiler.py         # Automated data profiling (column stats, domain validation, duplicates)
-├── report_generator.py      # Centralized HTML report generator
+├── dq_engine.py            # DQ rules execution engine (15 rules, remediation, scorecard outputs)
+├── app.py                   # Streamlit interactive DQ dashboard (4 tabs)
 ├── requirements.txt         # Python dependencies
 └── README.md
 ```
@@ -247,8 +243,9 @@ cmhc-housing-data-governance/
 
 | Tool | How It's Used |
 |------|---------------|
-| **Python (pandas, numpy)** | Data profiling, DQ rule execution, scorecard calculation, report generation |
-| **SQL** | All 12 DQ rules written as executable SQL — same pattern used for Informatica IDMC rule validation at CMHC |
+| **Python (pandas, numpy)** | DQ rule execution, scorecard calculation, data profiling |
+| **Streamlit + Plotly** | Interactive DQ dashboard — executive scorecard, exception explorer, live rule validation |
+| **SQL** | All 15 DQ rules written as executable SQL — same pattern used for Informatica IDMC rule validation at CMHC |
 | **Collibra** | Metadata catalog structure, business glossary, stewardship workflows, and governance roles in this project follow the same patterns used in Collibra Data Intelligence Cloud at CMHC |
 | **Informatica IDMC** | DQ rule design, exception management, and severity/remediation patterns in this project mirror the IDMC rule engine workflows validated during the CMHC internship |
 | **CSV / Excel-ready outputs** | All governance artifacts are exportable to Power BI dashboards or importable into enterprise catalog platforms |
@@ -275,21 +272,20 @@ cd cmhc-housing-data-governance
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the Data Profiler (column stats, domain validation, HTML report)
-python data_profiler.py
-
-# Run the DQ Engine (12 rules, remediation, scorecard, HTML report)
+# Run the DQ Engine (15 rules, remediation, scorecard outputs)
 python dq_engine.py
 
-# (Optional) Regenerate both HTML reports from saved CSVs
-python report_generator.py
+# Launch the interactive Streamlit dashboard
+streamlit run app.py
 ```
 
-**Outputs:**
-- `docs/dq_execution_report.html` — DQ rules execution report ([view live](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/dq_execution_report.html))
-- `docs/data_profile_report.html` — Data profiling report ([view live](https://rkdhakal.github.io/cmhc-housing-data-governance/docs/data_profile_report.html))
+**Outputs after running `dq_engine.py`:**
 - `data/processed/cmhc_housing_starts_remediated.csv` — Cleaned dataset with DQ flags
 - `data/processed/dq_exceptions.csv` — Record-level exception log
+- `scorecard/dq_execution_scorecard.csv` — Rule-level results
+- `scorecard/dq_scorecard_summary.csv` — Overall scorecard with grade
+
+**Dashboard available at** `http://localhost:8501`
 
 ---
 
@@ -297,13 +293,10 @@ python report_generator.py
 
 This project demonstrates governance patterns. In a real enterprise implementation, I would add:
 
-- **Automated scheduling** — DQ rules running on a cron or orchestrator (Airflow, Azure Data Factory) against live data, not a static CSV
-- **Live catalog API integration** — Pushing metadata and DQ scores directly into Collibra or Informatica CDGC via REST API, rather than CSV exports
-- **Role-based access controls** — Enforcing who can view, edit, or approve data assets, stewardship assignments, and DQ rule changes
-- **DQ trend monitoring** — Tracking quality scores over time to detect degradation patterns, not just point-in-time snapshots
-- **AI-assisted anomaly detection** — Using statistical models or ML to flag unexpected data patterns before they become rule failures
-- **Data observability layer** — Cross-system reconciliation checks (source vs. staging vs. warehouse) like the 4-hop validation I built at CMHC
-- **Incident management integration** — Connecting DQ exceptions to ticketing systems (ServiceNow, Jira) for formal tracking and SLA-based resolution
+- **Automated scheduling** — Run dq_engine.py on a monthly schedule via Airflow or Azure Data Factory, triggered when new CMHC data arrives, rather than executing manually against a static CSV
+- **Live Collibra integration** — Push DQ scores, rule results, and exception counts directly into Collibra via REST API after each run, so the catalog reflects current data quality without manual CSV imports
+- **DQ trend monitoring** — Append each scorecard run to a history table and plot scores over time in the dashboard, so stewards can see whether quality is improving, degrading, or stable across months
+- **Incident management integration** — Route FAIL and WARN exceptions automatically into ServiceNow or Jira with rule ID, severity, CDE, and assigned steward — replacing the current manual escalation step with a tracked, SLA-bound workflow
 
 ---
 
