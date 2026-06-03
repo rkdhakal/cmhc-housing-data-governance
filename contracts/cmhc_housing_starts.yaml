@@ -66,7 +66,7 @@ schema:
       type: string
       required: true
       description: Two-letter provincial abbreviation
-      validValues: [ON, QC, BC, AB, MB, SK, NS, NB, PE, NL, NT, YT, NU]
+      validValues: ["ON", "QC", "BC", "AB", "MB", "SK", "NS", "NB", "PE", "NL", "NT", "YT", "NU"]
       classification: Public
 
     - name: DWELLING_TYPE
