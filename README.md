@@ -72,6 +72,7 @@ It is designed to demonstrate the **full governance lifecycle** as practiced in 
   - `INTENDED_MARKET` — Rental vs. ownership market analysis
 - **Sensitivity classification** applied: Public / Internal / Confidential
 - **Data ownership** mapped: CDO → Data Owner → Data Steward → Custodian
+- **Regulatory applicability** assessed: PIPEDA (not applicable — no PII), OSFI B-20 (indirect — AVERAGE_PRICE_CAD feeds mortgage insurance thresholds), Open Government Licence – Canada (applicable — source data)
 
 ### 2. Data Lineage (5-Layer End-to-End)
 

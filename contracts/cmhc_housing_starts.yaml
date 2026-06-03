@@ -1,0 +1,292 @@
+dataContractSpecVersion: 0.9.3
+id: cmhc-housing-starts-2018-2023
+info:
+  title: CMHC Housing Starts — Canada (2018–2023)
+  version: 1.0.0
+  description: >
+    Monthly housing starts data across Canadian provinces by dwelling type
+    and intended market. Sourced from the CMHC Housing Market Information
+    Portal. Feeds federal GDP reporting, mortgage insurance thresholds, and
+    provincial housing policy decisions.
+  owner: Housing Market Analytics Team
+  dataOfficer: Chief Data Officer, CMHC
+  contact:
+    name: Data Governance Office
+    email: dramkrishna19@gmail.com
+
+servers:
+  production:
+    type: local
+    path: data/raw/cmhc_housing_starts_2018_2023.csv
+    format: csv
+    delimiter: ","
+
+terms:
+  usage: >
+    For housing policy analysis, federal reporting, and research purposes only.
+    Not to be used for commercial mortgage origination without CMHC approval.
+  limitations: >
+    Dataset covers 10 Canadian provinces only. Territories (NT, YT, NU) are
+    valid domain values but not present in this extract.
+  billing: Free
+  noticePeriod: 30 days
+  license: Open Government Licence – Canada
+
+schema:
+  type: table
+  fields:
+    - name: REF_DATE
+      type: string
+      format: "YYYY-MM"
+      required: true
+      description: Reference month in ISO 8601 format (YYYY-MM)
+      example: "2021-06"
+      classification: Public
+      criticalDataElement: true
+
+    - name: GEO
+      type: string
+      required: true
+      description: Province name (English)
+      validValues:
+        - Ontario
+        - Quebec
+        - British Columbia
+        - Alberta
+        - Manitoba
+        - Saskatchewan
+        - Nova Scotia
+        - New Brunswick
+        - Prince Edward Island
+        - Newfoundland and Labrador
+      classification: Public
+      criticalDataElement: true
+
+    - name: GEO_CODE
+      type: string
+      required: true
+      description: Two-letter provincial abbreviation
+      validValues: [ON, QC, BC, AB, MB, SK, NS, NB, PE, NL, NT, YT, NU]
+      classification: Public
+
+    - name: DWELLING_TYPE
+      type: string
+      required: true
+      description: Type of dwelling unit
+      validValues:
+        - Single-Detached
+        - Semi-Detached
+        - Row House
+        - Apartment - 5+ storeys
+        - Apartment - Under 5 storeys
+      classification: Public
+      criticalDataElement: true
+
+    - name: INTENDED_MARKET
+      type: string
+      required: true
+      description: Intended ownership or rental market
+      validValues:
+        - Homeowner
+        - Rental
+        - Condominium
+      classification: Public
+      criticalDataElement: true
+
+    - name: HOUSING_STARTS
+      type: number
+      required: false
+      minimum: 0
+      description: Number of housing units where construction has begun
+      classification: Public
+      criticalDataElement: true
+
+    - name: AVERAGE_PRICE_CAD
+      type: number
+      required: false
+      minimum: 0
+      maximum: 2000000
+      description: Average price of housing unit in Canadian dollars
+      classification: Internal
+      criticalDataElement: true
+
+    - name: DATA_SOURCE
+      type: string
+      required: true
+
+    - name: REPORTING_AGENCY
+      type: string
+      required: true
+
+    - name: LAST_UPDATED
+      type: string
+      required: true
+
+    - name: SURVEY_METHOD
+      type: string
+      required: true
+
+    - name: GEOGRAPHY_TYPE
+      type: string
+      required: true
+
+    - name: UOM
+      type: string
+      required: true
+
+    - name: SCALAR_FACTOR
+      type: string
+      required: true
+
+    - name: STATUS
+      type: string
+      required: false
+      validValues: [E, F, r]
+
+    - name: DECIMALS
+      type: integer
+      required: true
+
+quality:
+  type: SLA
+
+  tiers:
+    tier1:
+      label: Critical Data Elements
+      fields: [REF_DATE, GEO, GEO_CODE, DWELLING_TYPE, INTENDED_MARKET, HOUSING_STARTS, AVERAGE_PRICE_CAD]
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+      description: Highest governance priority — failures escalate to Data Steward within 24 hours
+    tier2:
+      label: Supporting Fields
+      fields: [DATA_SOURCE, REPORTING_AGENCY, LAST_UPDATED, SURVEY_METHOD, GEOGRAPHY_TYPE, UOM, SCALAR_FACTOR, STATUS, DECIMALS]
+      warnThreshold: 97.0
+      criticalThreshold: 95.0
+      description: Standard governance priority — failures reviewed in monthly steward cycle
+
+  dimensions:
+    - dimension: completeness
+      description: Minimum percentage of non-null values for required fields
+      tier1: { warn: 99.0, critical: 97.0 }
+      tier2: { warn: 97.0, critical: 95.0 }
+      unit: percentage
+
+    - dimension: validity
+      description: Minimum percentage of values conforming to defined domain rules
+      tier1: { warn: 99.0, critical: 97.0 }
+      tier2: { warn: 97.0, critical: 95.0 }
+      unit: percentage
+
+    - dimension: uniqueness
+      description: Grain uniqueness — REF_DATE + GEO_CODE + DWELLING_TYPE + INTENDED_MARKET
+      tier1: { warn: 99.0, critical: 97.0 }
+      unit: percentage
+
+    - dimension: accuracy
+      description: Values within statistically valid range (province-level z-score <= 3)
+      tier1: { warn: 99.0, critical: 97.0 }
+      unit: percentage
+
+    - dimension: consistency
+      description: GEO and GEO_CODE must match the canonical province mapping
+      tier1: { warn: 99.0, critical: 97.0 }
+      unit: percentage
+
+  rules:
+    - ruleId: DQ-001
+      field: HOUSING_STARTS
+      dimension: completeness
+      tier: 1
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-002
+      field: HOUSING_STARTS
+      dimension: validity
+      tier: 1
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-003
+      field: AVERAGE_PRICE_CAD
+      dimension: completeness
+      tier: 1
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-004
+      field: AVERAGE_PRICE_CAD
+      dimension: validity
+      tier: 1
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-005
+      field: AVERAGE_PRICE_CAD
+      dimension: validity
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-006
+      field: GEO_CODE
+      dimension: validity
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-007
+      field: DWELLING_TYPE
+      dimension: validity
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-008
+      field: INTENDED_MARKET
+      dimension: validity
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-009
+      field: REF_DATE
+      dimension: validity
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-010
+      field: REF_DATE+GEO_CODE+DWELLING_TYPE+INTENDED_MARKET
+      dimension: uniqueness
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-011
+      field: REF_DATE
+      dimension: validity
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-012
+      field: STATUS
+      dimension: validity
+      tier: 2
+      warnThreshold: 97.0
+      criticalThreshold: 95.0
+    - ruleId: DQ-013
+      field: HOUSING_STARTS
+      dimension: accuracy
+      tier: 1
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-014
+      field: AVERAGE_PRICE_CAD
+      dimension: accuracy
+      tier: 1
+      warnThreshold: 99.0
+      criticalThreshold: 97.0
+    - ruleId: DQ-015
+      field: GEO+GEO_CODE
+      dimension: consistency
+      tier: 1
+      warnThreshold: 100.0
+      criticalThreshold: 97.0
+
+serviceLevel:
+  availability: 99.5
+  retention: 7 years
+  updateFrequency: monthly
+  latency: 30 days
+  support: business-hours

@@ -258,8 +258,8 @@ def run_dq_rules(df: pd.DataFrame):
 
     # DQ-005: AVERAGE_PRICE_CAD ceiling
     record("DQ-005", "Average Price Ceiling Check", "Validity", "AVERAGE_PRICE_CAD",
-           "AVERAGE_PRICE_CAD must not exceed $10,000,000.", "Medium",
-           df["AVERAGE_PRICE_CAD"].fillna(0) > 10_000_000)
+           "AVERAGE_PRICE_CAD must not exceed $2,000,000.", "Medium",
+           df["AVERAGE_PRICE_CAD"].fillna(0) > 2_000_000)
 
     # DQ-006: GEO_CODE referential integrity
     geo_code = df["GEO_CODE"] if "GEO_CODE" in df.columns else pd.Series([""] * total, index=df.index)

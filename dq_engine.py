@@ -153,9 +153,9 @@ def run_dq_rules(df):
     run_rule(
         "DQ-005", "Average Price Ceiling Check",
         "Validity", "AVERAGE_PRICE_CAD",
-        "AVERAGE_PRICE_CAD must not exceed $10,000,000.",
+        "AVERAGE_PRICE_CAD must not exceed $2,000,000.",
         "Medium",
-        df["AVERAGE_PRICE_CAD"].fillna(0) > 10_000_000,
+        df["AVERAGE_PRICE_CAD"].fillna(0) > 2_000_000,
         "Escalate to Data Owner for manual review. Likely data entry error or unit mismatch."
     )
 
